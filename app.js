@@ -10,6 +10,9 @@ document.addEventListener("DOMContentLoaded", function() {
     const MMInput = document.getElementById('MMinpt');
     const YYInput = document.getElementById('YYinpt');
     const cardHolderInput = document.getElementById('cardHolderInput');
+    const detailInputs = document.querySelector('.detailinputs');
+    const thanks = document.querySelector('.thanks');
+
 
     cardBack.style.display = 'none';
 
@@ -85,6 +88,9 @@ document.addEventListener("DOMContentLoaded", function() {
             YYInput.style.borderColor = '#DFDEE0';
             cardHolderInput.style.borderColor = '#DFDEE0';
             cvcInput.style.borderColor = '#DFDEE0';
+
+            detailInputs.style.display = 'none';
+            thanks.style.display = 'flex';
         } else {
             
             if (cardNumberValue.length !== 16) {
