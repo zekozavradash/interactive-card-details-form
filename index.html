@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>interactive-card-details-form</title>
+</head>
+<body>
+    <div class="maincontainer">
+        <header>
+            <div class="cardfront" id="cardfront">
+                <img src="./img/Group 8.svg" alt="" class="profile">
+                <p class="cardnumber">0000 0000 0000 0000</p>
+                <div class="bottomfrontc">
+                    <p class="cardholder">JANE APPLESEED</p>
+                    <p class="expiration">00/00</p>
+                </div>
+            </div>
+    
+            <div class="cardback" id="cardback">
+                <div class="blackline"></div>
+                <div class="cvcdiv"><p class="cvc">000</p></div>
+                <img src="./img/Group 15.svg" alt="" class="backlines">
+            </div>
+        </header>
+    
+  
+    <div class="cardDetails" >
+        <div class="coolinput">
+            <label for="cardholder" class="label">CARDHOLDER NAME</label>
+            <input type="text" placeholder="e.g. Jane Appleseed" name="cardholder" class="inputs cardholderinpt" id="cardHolderInput" maxlength="30">
+        </div>
+        <div class="coolinput">
+            <label for="cardholder" class="label">CARD NUMBER</label>
+            <input type="text" placeholder="0000 0000 0000 0000" name="cardholder" class="inputs cardnumberinpt" id="cardNumberInput"
+            maxlength="19" >
+        </div>
+        <div class="halfinput">
+          <div class="expir">
+
+            <label for="expiration date" class="label">EXP DATE (MM / YY)</label>
+            <input type="text" placeholder="MM" name="car" class="inputs MM" id="MMinpt" maxlength="2" />
+            <input type="text" placeholder="YY" name="car" class="inputs YY" id="YYinpt" maxlength="2">
+
+          </div>
+          <div class="cvcinptdiv">
+            <label for="CVC" class="label">CVC</label>
+            <input type="text" placeholder="e.g. 123" class="inputs cvcinpt" id="cvcinpt" maxlength="3">
+          </div>
+        </div>
+    <button class="cornfirmbtn" id="cornfirmBtn">Confirm</button>
+    </div>
+</div>
+
+
+    
+<script src="app.js"></script>
+</body>
+</html>
+
+    
+
+
+
+
+
+
