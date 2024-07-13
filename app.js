@@ -13,13 +13,18 @@ document.addEventListener("DOMContentLoaded", function() {
     const detailInputs = document.querySelector('.detailinputs');
     const thanks = document.querySelector('.thanks');
 
-
     cardBack.style.display = 'none';
+
+    const defaultCardNumber = cardNumber.textContent;
+    const defaultExpiration = cardExpiration.textContent;
+    const defaultCardHolder = cardHolder.textContent;
+    const cvcElement = document.querySelector('.cvc');
+    const defaultCvc = cvcElement.textContent;
 
     cardFront.addEventListener('click', function() {
         cardBack.style.display = 'block';
-        hideTooltipFront(); //თულტიპის გაქრობა
-        
+        hideTooltipFront();
+
         if (cardBack.style.display === "block") {
             cardFront.style.cursor = "default";
         }
@@ -27,62 +32,57 @@ document.addEventListener("DOMContentLoaded", function() {
 
     cardBack.addEventListener('click', function() {
         cardBack.style.display = 'none';
-        
+
         cardFront.style.cursor = "pointer";
     });
 
-    // თულტიპის გამჩენა
     function showTooltipFront() {
         if (cardBack.style.display !== "block") {
             cardFront.setAttribute("data-tooltip", "Click to see the back side and CVC");
         }
     }
 
-    // თულტიპის გაქრობა
     function hideTooltipFront() {
         if (cardBack.style.display === "block") {
             cardFront.removeAttribute("data-tooltip"); 
         }
     }
 
-    // Show tooltip
     function showTooltipBack() {
         cardBack.setAttribute("data-tooltip", "Click to make back side disappear");
     }
 
-    // თულტიპის გაქრობა
     function hideTooltipBack() {
         cardBack.removeAttribute("data-tooltip");
     }
 
-    // თულტიპის ფუნქციონალი
     cardFront.addEventListener("mouseenter", showTooltipFront);
     cardFront.addEventListener("mouseleave", hideTooltipFront);
     cardBack.addEventListener("mouseenter", showTooltipBack);
     cardBack.addEventListener("mouseleave", hideTooltipBack);
 
-    // Confirm ღილაკის ფუნქციონალი
     const confirmBtn = document.getElementById('cornfirmBtn');
     confirmBtn.addEventListener('click', function() {
-        //ინპუტების ვალიდურობა
+        if (confirmBtn.textContent === "Refresh") {
+            location.reload();
+            return;
+        }
+
         const cardNumberValue = cardNumberInput.value.replace(/\D/g, '');
         const mmValue = MMInput.value.replace(/\D/g, '');
         const yyValue = YYInput.value.replace(/\D/g, '');
         const cardHolderValue = cardHolderInput.value.trim();
         const cvcValue = cvcInput.value.replace(/\D/g, '');
 
-        // ინპუტის ვალიდაციები
         if (cardNumberValue.length === 16 &&
             mmValue.length <= 2 && yyValue.length === 2 &&
             cardHolderValue !== '' && cvcValue.length === 3 && !/\d/.test(cardHolderValue)) {
-            // ბარათის მონაცემების შეცვლა
-            cardNumber.textContent = cardNumberValue.match(/.{1,4}/g).join(' ');
+
+            cardNumber.textContent = formatCardNumber(cardNumberValue);
             cardExpiration.textContent = `${mmValue}/${yyValue}`;
             cardHolder.textContent = cardHolderValue;
-            const cvcElement = document.querySelector('.cvc');
-            cvcElement.textContent = cvcValue;
+            cvcElement.textContent = formatCVCWithPlaceholders(cvcValue);
 
-            
             cardNumberInput.style.borderColor = '#DFDEE0';
             MMInput.style.borderColor = '#DFDEE0';
             YYInput.style.borderColor = '#DFDEE0';
@@ -91,8 +91,9 @@ document.addEventListener("DOMContentLoaded", function() {
 
             detailInputs.style.display = 'none';
             thanks.style.display = 'flex';
+
+            confirmBtn.textContent = "Refresh";
         } else {
-            
             if (cardNumberValue.length !== 16) {
                 cardNumberInput.style.borderColor = 'red';
             } else {
@@ -118,67 +119,68 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
 
-    // ბარათის ნომრის ვალიდაცია
     cardNumberInput.addEventListener('input', function(e) {
-        let value = e.target.value;
-        // ასოების აკრძალვა
-        value = value.replace(/\D/g, '');
-
-        // ოთხ ოთხ ციფრად დაჯგუფება
-        let formattedValue = '';
-        for (let i = 0; i < value.length; i += 4) {
-            formattedValue += value.substr(i, 4) + ' ';
-        }
-        
-        formattedValue = formattedValue.trim();
-
-        e.target.value = formattedValue;
+        let value = e.target.value.replace(/\D/g, '');
+        cardNumber.textContent = formatCardNumberWithPlaceholders(value);
+        e.target.value = formatCardNumber(value);
     });
 
-    // MM ინპუტის ვალიდაცია
     MMInput.addEventListener('input', function(e) {
-        let value = e.target.value;
-        // ასოების აკრძალვა
-        value = value.replace(/\D/g, '');
-        // MM რეგექსი (რეგექსები ChatGPTს დავაწერინე)
-        const mmRegex = /^(0?[1-9]|1[0-2])?$/; 
-        //რეგექსის ტესტი
+        let value = e.target.value.replace(/\D/g, '');
+        const mmRegex = /^(0?[1-9]|1[0-2])?$/;
         if (mmRegex.test(value)) {
-           
             if (value.length <= 2) {
                 e.target.value = value;
+                cardExpiration.textContent = `${value}/${YYInput.value}` || defaultExpiration;
             } else {
-                
                 e.target.value = value.slice(0, 2);
+                cardExpiration.textContent = `${value.slice(0, 2)}/${YYInput.value}` || defaultExpiration;
             }
         } else {
-            
             e.target.value = value.slice(0, -1);
         }
     });
 
-    // YY input validation
     YYInput.addEventListener('input', function(e) {
-        let value = e.target.value;
-        // ასოების აკრძალვა
-        value = value.replace(/\D/g, '');
-        // YY რეგექსი
-        const yyRegex = /^(0?[0-9]|1[0-9]|2[0-9]|3[0-9])?$/; 
-        // რეგექსის ტესტი
+        let value = e.target.value.replace(/\D/g, '');
+        const yyRegex = /^(0?[0-9]|1[0-9]|2[0-9]|3[0-9])?$/;
         if (yyRegex.test(value)) {
-            
-            
             if (value.length <= 2) {
-                
                 e.target.value = value;
+                cardExpiration.textContent = `${MMInput.value}/${value}` || defaultExpiration;
             } else {
-               
                 e.target.value = value.slice(0, 2);
-                
+                cardExpiration.textContent = `${MMInput.value}/${value.slice(0, 2)}` || defaultExpiration;
             }
         } else {
-            
             e.target.value = value.slice(0, -1);
         }
     });
+
+    cardHolderInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+        cardHolder.textContent = value || defaultCardHolder;
+        e.target.value = value;
+    });
+
+    cvcInput.addEventListener('input', function(e) {
+        let value = e.target.value.replace(/\D/g, '');
+        cvcElement.textContent = formatCVCWithPlaceholders(value);
+        e.target.value = value;
+    });
+
+    function formatCardNumber(value) {
+        let formattedValue = value.match(/.{1,4}/g)?.join(' ') || '';
+        return formattedValue.trim();
+    }
+
+    function formatCardNumberWithPlaceholders(value) {
+        let formattedValue = value.padEnd(16, '0').match(/.{1,4}/g).join(' ');
+        return formattedValue.replace(/0/g, (_, index) => (index < value.length ? value[index] : '0'));
+    }
+
+    function formatCVCWithPlaceholders(value) {
+        let formattedValue = value.padEnd(3, '0');
+        return formattedValue.replace(/0/g, (_, index) => (index < value.length ? value[index] : '0'));
+    }
 });
